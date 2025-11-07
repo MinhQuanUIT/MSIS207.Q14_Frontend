@@ -1,37 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Routes, Route, Link, NavLink } from 'react-router-dom'
+import Home from './pages/Home'
+import About from './pages/About'
+import NotFound from './pages/NotFound'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div className="flex justify-center gap-8 mb-8">
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1 className="text-5xl font-bold text-blue-600 mb-4">Vite + React</h1>
-      <div className="card bg-gray-100 p-6 rounded-lg shadow-md">
-        <button 
-          onClick={() => setCount((count) => count + 1)}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
-        >
-          count is {count}
-        </button>
-        <p className="mt-4 text-gray-700">
-          Edit <code className="bg-gray-200 px-2 py-1 rounded">src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs text-red-500 font-semibold mt-4">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation Bar */}
+      <nav className="bg-white shadow-md">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <Link to="/" className="text-2xl font-bold text-blue-600">
+              📚 Bookstore
+            </Link>
+            
+            <div className="flex gap-6">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `font-semibold transition ${
+                    isActive 
+                      ? 'text-blue-600 border-b-2 border-blue-600' 
+                      : 'text-gray-600 hover:text-blue-600'
+                  }`
+                }
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/about"
+                className={({ isActive }) =>
+                  `font-semibold transition ${
+                    isActive 
+                      ? 'text-blue-600 border-b-2 border-blue-600' 
+                      : 'text-gray-600 hover:text-blue-600'
+                  }`
+                }
+              >
+                About
+              </NavLink>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
   )
 }
 
