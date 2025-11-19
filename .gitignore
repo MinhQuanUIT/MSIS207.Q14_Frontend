@@ -3,3 +3,4 @@
 # Ignore node modules inside the Bookshop_FE subproject
 Bookshop_FE/node_modules/
 
+node_modules

@@ -1,0 +1,14 @@
+.app-layout {
+  min-height: 100vh;
+}
+.top-menu-wrap {
+  background: #f0f2f5;
+  padding: 12px 24px;
+}
+.top-menu-wrap .ant-menu {
+  background: transparent;
+  border: none;
+}
+.content-wrap {
+  padding: 24px;
+}
