@@ -4,7 +4,7 @@ import { Link, Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/layout/Header'
 import Home from './pages/Home'
 import About from './pages/About'
-import './App.css'
+import './styles/App.css'
 
 const { Content } = Layout
 const { Title } = Typography
