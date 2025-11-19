@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Row, Col, Input, Button, Dropdown } from 'antd'
 import { ShoppingCartOutlined, UserOutlined, SearchOutlined, DownOutlined } from '@ant-design/icons'
 import IconButton from './IconButton'
+import TypeProduct from '../TypeProduct/TypeProduct'
 import './Header.css'
 
 export default function Header() {
@@ -35,6 +36,7 @@ export default function Header() {
               Search
             </IconButton>
           </div>
+          <TypeProduct />
         </Col>
 
         {/* Action Buttons - col-6 */}
