@@ -1,0 +1,261 @@
+.card-cover-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.ant-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 10px;
+}
+.card-price {
+  color: #ff4d4f;
+  font-weight: 700;
+  font-size: 16px;
+}
+.card-old-price {
+  color: #8c8c8c;
+  text-decoration: line-through;
+  font-size: 12px;
+}
+
+/* cover wrapper and overlay badges to keep consistent look */
+.cover-wrapper {
+  position: relative;
+}
+
+.cover-badges {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.cover-badge {
+  background: rgba(255, 69, 58, 0.95);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+/* reserve footer area so cards keep equal heights */
+.card-footer {
+  min-height: 48px; /* reserve space for promos & shipping */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* product card root helper to ensure full-height cards */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 6px;
+}
+
+/* main content area grows so price/footer sit at consistent position */
+.card-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-bottom {
+  margin-top: 8px;
+}
+
+/* Ensure grid columns stretch so cards have equal heights and prices align */
+.products-grid .ant-col {
+  display: flex;
+}
+
+.products-grid .ant-col > .ant-card.product-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.products-grid .ant-col > .ant-card.product-card .ant-card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px !important;
+}
+
+/* push price row down to sit just above footer */
+.card-bottom {
+  margin-top: auto;
+}
+
+.card-footer {
+  min-height: 56px;
+}
+
+/* Also target the featured grid used in Home.jsx so AntD columns/cards stretch */
+.featured-grid .ant-col {
+  display: flex;
+}
+
+.featured-grid .ant-col > .ant-card.product-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.featured-grid .ant-col > .ant-card.product-card .ant-card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px !important;
+}
+
+.featured-grid .ant-col .card-bottom {
+  margin-top: auto;
+}
+
+.featured-grid .ant-col .card-footer {
+  min-height: 60px;
+}
+
+/* Force card-footer to have consistent height so all cards align */
+.card-footer {
+  min-height: 60px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Grid helper to place cards under the slider */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 18px;
+}
+
+@media (max-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 900px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* small card inner layout */
+.product-card-inner {
+  padding: 8px 6px 12px 6px;
+}
+
+/* Product name typography used for product title inside card */
+.stylenameproduct {
+  color: rgb(39, 39, 42);
+  text-overflow: ellipsis;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: 0px;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Author / small vendor text under title */
+.product-author {
+  font-size: 12px;
+  color: #8c8c8c;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* Rating and sold count row */
+.product-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #faad14; /* star color fallback */
+}
+.product-sold {
+  color: #8c8c8c;
+  font-size: 13px;
+}
+
+/* Badges like TOP DEAL, CHÍNH HÃNG etc */
+.product-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.product-badge {
+  background: #f5f7fa;
+  color: #096dd9;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* promos have a slightly different look */
+.product-promos {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.product-promo {
+  background: #ffffff;
+  border: 1px solid #e6f7ff;
+  color: #096dd9;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+/* shipping label (small red text) */
+.product-shipping {
+  margin-top: 8px;
+  color: #ff4d4f;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* Price rows already defined; ensure spacing */
+.card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.card-price {
+  color: #ff4d4f;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.card-old-price {
+  color: #8c8c8c;
+  text-decoration: line-through;
+  font-size: 12px;
+}
