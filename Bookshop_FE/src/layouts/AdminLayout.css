@@ -1,0 +1,41 @@
+.admin-layout {
+  min-height: 100vh;
+}
+
+.admin-logo {
+  padding: 16px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  margin-bottom: 16px;
+}
+
+.admin-logo h2 {
+  color: #fff;
+  margin: 0;
+  font-size: 18px;
+}
+
+.admin-header {
+  background: #fff;
+  padding: 0 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.admin-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-header-content h3 {
+  margin: 0;
+  color: #1890ff;
+}
+
+.admin-content {
+  margin: 24px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  min-height: 360px;
+}

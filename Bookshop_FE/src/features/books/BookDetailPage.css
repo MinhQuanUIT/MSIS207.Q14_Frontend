@@ -1,0 +1,144 @@
+.book-detail-page {
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding: 24px 0 60px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.book-image-wrapper {
+  text-align: center;
+  background: #fff;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  position: sticky;
+  top: 80px;
+}
+
+.book-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+.stock-info {
+  margin-top: 16px;
+  padding: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.book-info {
+  background: #fff;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.book-author {
+  display: block;
+  margin: 12px 0 8px;
+  color: #666;
+  font-size: 15px;
+}
+
+.book-category {
+  display: block;
+  margin: 4px 0 16px;
+  color: #1890ff;
+  font-size: 14px;
+}
+
+.book-rating {
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+}
+
+.book-price-section {
+  margin: 24px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.price-main {
+  font-size: 36px;
+  font-weight: 700;
+  color: #ff4d4f;
+}
+
+.price-old {
+  font-size: 20px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.discount-badge {
+  background: #ff4d4f;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.book-badges {
+  margin: 16px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.book-badges .badge {
+  background: #e6f7ff;
+  color: #1890ff;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  border: 1px solid #91d5ff;
+}
+
+.book-description-section {
+  margin-top: 24px;
+}
+
+.book-description {
+  margin: 16px 0;
+  color: #666;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.book-actions {
+  margin-top: 32px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+@media (max-width: 768px) {
+  .book-image-wrapper {
+    position: static;
+    margin-bottom: 24px;
+  }
+  
+  .book-info {
+    padding: 20px;
+  }
+  
+  .price-main {
+    font-size: 28px;
+  }
+}

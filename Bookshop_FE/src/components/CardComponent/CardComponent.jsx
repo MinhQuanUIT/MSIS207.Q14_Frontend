@@ -1,11 +1,13 @@
 import React from 'react'
 import { Card } from 'antd'
 import { StarFilled } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
 import './CardComponent.css'
 
 const { Meta } = Card
 
 export default function CardComponent({
+	_id = '',
 	title = 'Product',
 	author = '',
 	rating = null,
@@ -13,20 +15,30 @@ export default function CardComponent({
 	badges = [],
 	promos = [],
 	shipping = '',
-	image = 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png',
+	image = 'https://via.placeholder.com/240x220/f0f0f0/666?text=Book',
 	width = 240,
 	hoverable = true,
 	price = '',
 	oldPrice = '',
 	onClick
 }) {
+	const navigate = useNavigate()
+
+	const handleClick = () => {
+		if (onClick) {
+			onClick()
+		} else if (_id) {
+			navigate(`/books/${_id}`)
+		}
+	}
+
 	return (
 		<Card
 			hoverable={hoverable}
 			className="product-card"
-			style={{ width, height: '100%' }}
+			style={{ width, height: '100%', cursor: 'pointer' }}
 			bodyStyle={{ padding: 12, display: 'flex', flexDirection: 'column', height: '100%' }}
-			onClick={onClick}
+			onClick={handleClick}
 			cover={
 				<div className="cover-wrapper">
 					<img draggable={false} alt={title} src={image} className="card-cover-image" />
