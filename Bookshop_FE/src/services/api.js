@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json'
   },
@@ -11,7 +11,7 @@ const api = axios.create({
 // Request interceptor - attach token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token')
+    const token = localStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -27,14 +27,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Only auto-logout and redirect if it's a token expiration issue
-    // Don't redirect if user simply isn't logged in (e.g., accessing protected route)
     if (error.response?.status === 401) {
-      const token = localStorage.getItem('access_token')
-      // Only clear token if user had a token (it expired)
-      // Don't redirect here - let components handle navigation
+      const token = localStorage.getItem('token')
+      // Clear token and role if user had a token (it expired)
       if (token) {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('user')
+        localStorage.removeItem('token')
+        localStorage.removeItem('role')
       }
     }
     return Promise.reject(error)
