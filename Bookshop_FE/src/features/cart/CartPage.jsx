@@ -14,7 +14,7 @@ export default function CartPage() {
 
   useEffect(() => {
     // Check if user is logged in
-    const token = localStorage.getItem('access_token')
+    const token = localStorage.getItem('token')
     if (!token) {
       message.warning('Vui lòng đăng nhập để xem giỏ hàng')
       navigate('/login')

@@ -23,9 +23,13 @@ export default function BookDetailPage() {
   const loadBook = async () => {
     try {
       setLoading(true)
+      console.log('Loading book with ID:', id)
       const response = await bookService.getById(id)
+      console.log('API Response:', response.data)
       // Handle both response.data.data (from mock) and response.data (direct)
-      setBook(response.data.data || response.data)
+      const bookData = response.data.data || response.data
+      console.log('Book data:', bookData)
+      setBook(bookData)
     } catch (error) {
       message.error('Không thể tải thông tin sách')
       console.error('Error loading book:', error)
@@ -35,7 +39,7 @@ export default function BookDetailPage() {
   }
 
   const handleAddToCart = async () => {
-    const token = localStorage.getItem('access_token')
+    const token = localStorage.getItem('token')
     if (!token) {
       message.warning('Vui lòng đăng nhập để thêm vào giỏ hàng')
       navigate('/login')

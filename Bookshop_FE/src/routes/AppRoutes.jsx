@@ -6,6 +6,7 @@ import AdminLayout from '../layouts/AdminLayout'
 // User pages
 import HomePage from '../pages/HomePage'
 import AboutPage from '../pages/AboutPage'
+import ProductDetailPage from '../pages/ProductDetailPage'
 
 // Features
 import BookListPage from '../features/books/BookListPage'
@@ -31,7 +32,7 @@ export default function AppRoutes() {
         
         {/* Books */}
         <Route path="/books" element={<BookListPage />} />
-        <Route path="/books/:id" element={<BookDetailPage />} />
+        <Route path="/books/:id" element={<ProductDetailPage />} />
         
         {/* Auth */}
         <Route path="/login" element={<LoginPage />} />

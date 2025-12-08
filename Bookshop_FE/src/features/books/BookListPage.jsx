@@ -19,7 +19,8 @@ export default function BookListPage() {
     try {
       setLoading(true)
       const response = await bookService.getAll()
-      setBooks(response.data)
+      // Handle response structure from mock server: { success: true, data: [...] }
+      setBooks(response.data.data || response.data)
     } catch (error) {
       message.error('Không thể tải danh sách sách')
       console.error('Error loading books:', error)
@@ -51,6 +52,7 @@ export default function BookListPage() {
               {books.map((book) => (
                 <Col key={book._id} xs={24} sm={12} md={12} lg={6}>
                   <CardComponent
+                    _id={book._id}
                     title={book.title}
                     author={book.author}
                     image={book.image}
