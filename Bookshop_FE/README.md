@@ -1,216 +1,169 @@
-# 📚 TiQiShop Bookstore - Frontend
+# 📚 TiQi Bookstore - Frontend
 
-React-based bookstore application với kiến trúc module hóa, Tiki-inspired UI.
+Ứng dụng web bán sách được xây dựng bằng **React 18** + **Vite** với thiết kế lấy cảm hứng từ Tiki.
 
-## 🏗️ Kiến trúc dự án
+## 🚀 Quick Start
 
-```
-src/
-├── layouts/              # Layout components
-│   ├── MainLayout.jsx    # User layout (Header + Footer)
-│   └── AdminLayout.jsx   # Admin layout (Sidebar)
-│
-├── routes/
-│   └── AppRoutes.jsx     # Định nghĩa tất cả routes
-│
-├── components/
-│   ├── layout/           # Header, Footer
-│   ├── navbar/           # NavbarComponent, CategoryMenu
-│   ├── product/          # CardComponent, SliderComponent, TypeProduct
-│   └── common/           # IconButton, Loading, Modal
-│
-├── features/             # Feature modules
-│   ├── books/            # Quản lý sách
-│   ├── auth/             # Đăng nhập/Đăng ký
-│   ├── cart/             # Giỏ hàng
-│   └── admin/            # Admin dashboard
-│
-├── services/             # API communication layer
-│   ├── api.js            # Axios instance + interceptors
-│   ├── book.service.js   # Book APIs
-│   ├── auth.service.js   # Authentication APIs
-│   ├── cart.service.js   # Cart APIs
-│   └── admin.service.js  # Admin APIs
-│
-├── hooks/                # Custom React hooks
-├── store/                # Redux store (future)
-├── utils/                # Utility functions
-└── styles/               # Global CSS
-```
-
-## 🚀 Cài đặt & Chạy
-
-### Prerequisites
-- Node.js >= 16
-- npm hoặc yarn
-
-### Installation
-
-\`\`\`bash
-# Clone repository
-git clone <repo-url>
-
-# Vào thư mục project
-cd Bookshop_FE
-
-# Cài đặt dependencies
+### Cài đặt dependencies
+```bash
 npm install
+```
 
-# Copy file môi trường
-cp .env.example .env
-
-# Chạy development server
+### Chạy development server
+```bash
+# Terminal 1: Chạy frontend (port 5173)
 npm run dev
-\`\`\`
 
-Server sẽ chạy tại: `http://localhost:5173`
+# Terminal 2: Chạy mock backend (port 5000)
+node server/mock-server.cjs
+```
 
-## 📍 Routes
+Truy cập: `http://localhost:5173`
 
-### User Routes
-- `/` - Trang chủ
-- `/books` - Danh sách tất cả sách
-- `/books/:id` - Chi tiết sách
-- `/cart` - Giỏ hàng
-- `/login` - Đăng nhập
-- `/register` - Đăng ký
+## 📦 Tech Stack
 
-### Admin Routes
-- `/admin` - Dashboard
-- `/admin/books` - Quản lý sách
-- `/admin/users` - Quản lý người dùng
-- `/admin/orders` - Quản lý đơn hàng
-- `/admin/reports` - Báo cáo
+- **React 18** - UI Framework
+- **Vite 5** - Build tool & Dev server
+- **React Router DOM v7** - Client-side routing
+- **Ant Design 5** - UI Component library
+- **Axios** - HTTP client
+- **Redux Toolkit** - State management
+- **Express** - Mock backend server
 
-## 🔧 Services Layer
+## 🏗️ Cấu trúc dự án
 
-### API Configuration
-File `services/api.js` tạo axios instance với:
-- Base URL từ environment variable
-- Auto-attach JWT token
-- Error handling (401 → redirect login)
+```
+Bookshop_FE/
+├── src/
+│   ├── components/          # Shared components
+│   │   ├── layout/          # Header, Footer
+│   │   └── ProductDetail/   # Product detail components
+│   │
+│   ├── pages/               # Route-level pages
+│   │   ├── HomePage/
+│   │   ├── ProductDetailPage/
+│   │   └── ...
+│   │
+│   ├── features/            # Feature modules
+│   │   ├── auth/            # Login, Register
+│   │   ├── admin/           # Admin dashboard
+│   │   └── ...
+│   │
+│   ├── services/            # API services
+│   │   ├── auth.service.js
+│   │   ├── book.service.js
+│   │   └── cart.service.js
+│   │
+│   ├── layouts/             # Layout wrappers
+│   │   ├── MainLayout.jsx   # User layout
+│   │   └── AdminLayout.jsx  # Admin layout
+│   │
+│   ├── routes/
+│   │   └── AppRoutes.jsx    # Route definitions
+│   │
+│   └── utils/               # Utilities
+│
+├── server/
+│   └── mock-server.cjs      # Mock backend (Express)
+│
+└── public/                  # Static assets
+```
 
-### Sử dụng Services
+## 🎯 Features
 
-\`\`\`jsx
-import { bookService } from '@/services/book.service'
+### ✅ Đã hoàn thành
+- **Authentication**: Đăng nhập, đăng ký với JWT
+- **Product Detail**: Trang chi tiết sản phẩm theo thiết kế Tiki
+  - Gallery ảnh sản phẩm
+  - Thông tin sản phẩm chi tiết
+  - Panel mua hàng (sticky)
+  - Đánh giá khách hàng
+  - Sản phẩm tương tự
+- **Header**: Tìm kiếm, giỏ hàng, tài khoản
+- **Responsive Design**: Mobile-friendly
+- **Mock Backend**: Express server với in-memory storage
 
-// Get all books
-const books = await bookService.getAll()
+### 🔜 Roadmap
+- Kết nối backend thực
+- Shopping cart functionality
+- Payment integration
+- Order management
+- Admin dashboard
 
-// Get book by ID
-const book = await bookService.getById('123')
+## 🛠️ Available Scripts
 
-// Search
-const results = await bookService.search('react')
-\`\`\`
+```bash
+# Development
+npm run dev          # Chạy dev server (port 5173)
 
-## 🎨 UI Components
+# Production
+npm run build        # Build cho production
+npm run preview      # Preview production build
 
-### CardComponent
-Hiển thị thông tin sách với Tiki-inspired design:
-- Image + badges overlay
-- Title, author, rating
-- Price (old price + discount)
-- Promos & shipping info
+# Mock Backend
+node server/mock-server.cjs    # Start mock API server (port 5000)
+```
 
-### NavbarComponent
-Left sidebar với collapsible categories
+## 🔌 API Endpoints (Mock Server)
 
-### SliderComponent
-React-slick carousel cho promotional banners
+### Authentication
+- `POST /api/auth/register` - Đăng ký tài khoản
+- `POST /api/auth/login` - Đăng nhập
+- `GET /api/auth/me` - Lấy thông tin user hiện tại
 
-## 🔐 Authentication Flow
+### Books
+- `GET /api/books` - Lấy danh sách sách
+- `GET /api/books/:id` - Chi tiết sách
 
-1. User login → `authService.login()`
-2. Backend trả về `{ token, user }`
-3. Store token vào localStorage
-4. Attach token vào mọi API request
-5. 401 error → auto logout + redirect
+### Cart
+- `GET /api/cart` - Lấy giỏ hàng
+- `POST /api/cart/items` - Thêm vào giỏ
 
-## 🛒 Cart Flow
+### Admin
+- `GET /api/admin/stats` - Thống kê
+- `GET /api/admin/users` - Quản lý users
+- `GET /api/admin/orders` - Quản lý đơn hàng
 
-1. Add to cart → `cartService.addItem(bookId, quantity)`
-2. Update quantity → `cartService.updateItem(itemId, quantity)`
-3. Remove → `cartService.removeItem(itemId)`
-4. Checkout → `cartService.checkout(orderData)`
+## 🌐 Kết nối Backend
 
-## 👨‍💼 Admin Features
+### Bước 1: Cấu hình môi trường
+Tạo file `.env` tại root:
+```env
+VITE_API_BASE_URL=http://localhost:5000/api
+```
 
-- **Dashboard**: Thống kê tổng quan (books, users, orders, revenue)
-- **Books Management**: CRUD operations cho sách
-- **Users Management**: Quản lý người dùng
-- **Orders Management**: Xử lý đơn hàng
-- **Reports**: Báo cáo doanh thu
+### Bước 2: Start backend server
+```bash
+# Nếu dùng mock server
+node server/mock-server.cjs
 
-## 📦 Dependencies
+# Hoặc nếu có backend riêng
+# Chạy backend server của bạn trên port 5000
+```
 
-### Core
-- `react` - UI framework
-- `react-router-dom` - Routing
-- `axios` - HTTP client
-- `antd` - UI component library
+### Bước 3: Start frontend
+```bash
+npm run dev
+```
 
-### Styling
-- `react-slick` - Carousel
-- `slick-carousel` - Carousel CSS
+## 📱 Responsive Breakpoints
 
-### Dev
-- `vite` - Build tool
-- `@vitejs/plugin-react` - Vite React plugin
+- **Mobile**: < 768px
+- **Tablet**: 768px - 1024px
+- **Desktop**: > 1024px
 
-## 🌐 Environment Variables
+## 🎨 Design System
 
-\`\`\`env
-VITE_API_URL=http://localhost:5000/api
-VITE_APP_NAME=TiQiShop Bookstore
-\`\`\`
-
-## 📝 Coding Standards
-
-### Component Structure
-\`\`\`jsx
-import React, { useState, useEffect } from 'react'
-import { service } from '@/services/...'
-import './Component.css'
-
-export default function Component() {
-  // State
-  // Effects
-  // Handlers
-  // Render
-}
-\`\`\`
-
-### File Naming
-- Components: `PascalCase.jsx`
-- Services: `camelCase.service.js`
-- Utils: `camelCase.js`
-- CSS: match component name
-
-## 🚧 TODO / Roadmap
-
-- [ ] Implement Redux Toolkit cho state management
-- [ ] Add search functionality với debounce
-- [ ] Pagination cho book list
-- [ ] Image upload cho admin
-- [ ] Order tracking
-- [ ] Payment integration
-- [ ] Email notifications
-- [ ] Reviews & ratings system
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+- **Primary Color**: `#1890ff` (Blue)
+- **Accent Color**: `#ff424e` (Red - Buttons)
+- **Background**: `#f5f5f5` (Gray)
+- **Text**: `#242424` (Dark gray)
 
 ## 📄 License
 
-MIT License - see LICENSE file
+Private project - All rights reserved © 2025 TiQi Bookstore
 
----
+## 👥 Contact
 
-**Developed with ❤️ by TiQiShop Team**
+- Repository: [MSIS207.Q14_Frontend](https://github.com/MinhQuanUIT/MSIS207.Q14_Frontend)
+- Owner: MinhQuanUIT
