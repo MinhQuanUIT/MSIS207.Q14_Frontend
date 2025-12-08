@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const { loadUsers, saveUsers, addUser, clearUsers } = require('./utils/fileStorage')
 
 const app = express()
 const PORT = 5000
@@ -9,8 +10,8 @@ const PORT = 5000
 app.use(cors())
 app.use(bodyParser.json())
 
-// In-memory storage
-const users = []
+// Storage
+let users = loadUsers() // Load từ file khi khởi động
 const books = []
 
 // Helper to find user by email
@@ -52,6 +53,7 @@ app.post('/api/auth/register', (req, res) => {
   }
 
   users.push(newUser)
+  saveUsers(users) // Lưu vào file
 
   console.log('✅ User registered successfully:', newUser.email)
   console.log('📊 Total users:', users.length)
@@ -69,6 +71,9 @@ app.post('/api/auth/register', (req, res) => {
 // Login
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body
+
+  // Reload users từ file để có data mới nhất
+  users = loadUsers()
 
   console.log('🔐 Login request:', email)
 
@@ -249,12 +254,13 @@ app.post('/api/cart/items', (req, res) => {
 
 // Reset database (for testing/development only)
 app.post('/api/admin/reset-db', (req, res) => {
-  // Clear all users (keep structure)
+  // Clear all users
   users.length = 0
+  clearUsers() // Xóa file
   // Clear all carts
   Object.keys(carts).forEach(key => delete carts[key])
   
-  console.log('🔄 Database reset! All users cleared.')
+  console.log('🔄 Database reset! All users cleared from file.')
   
   res.json({
     success: true,
@@ -264,6 +270,9 @@ app.post('/api/admin/reset-db', (req, res) => {
 
 // Get all users (dev only - to verify registration)
 app.get('/api/admin/users', (req, res) => {
+  // Reload users từ file
+  users = loadUsers()
+  
   res.json({
     success: true,
     data: users.map(u => {
