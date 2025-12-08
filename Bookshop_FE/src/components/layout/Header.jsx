@@ -37,7 +37,7 @@ export default function Header() {
         {/* Logo / Shop Name - col-6 */}
         <Col span={6}>
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className="header-logo">TiQiShop</div>
+            <div className="header-logo">TiQi</div>
           </Link>
         </Col>
 
@@ -53,7 +53,7 @@ export default function Header() {
               prefix={<SearchOutlined />}
             />
             <IconButton className="search-button" type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-              Search
+              Tìm kiếm
             </IconButton>
           </div>
           <TypeProduct />

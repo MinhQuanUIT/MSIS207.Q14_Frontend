@@ -12,7 +12,7 @@ export default function MainLayout() {
       </main>
       <footer className="main-footer">
         <div className="footer-content">
-          <p>&copy; 2025 TiQiShop - Bookstore. All rights reserved.</p>
+          <p>&copy; 2025 TiQi - Bookstore. All rights reserved.</p>
         </div>
       </footer>
     </div>

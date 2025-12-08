@@ -60,7 +60,7 @@ export default function AdminLayout() {
       <Layout>
         <Header className="admin-header">
           <div className="admin-header-content">
-            <h3>TiQiShop Admin</h3>
+            <h3>TiQi Admin</h3>
             <Link to="/">← Về trang chủ</Link>
           </div>
         </Header>
