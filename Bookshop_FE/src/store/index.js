@@ -1,21 +1,30 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
+import authReducer from './slices/authSlice'
+import cartReducer from './slices/cartSlice'
 
-const counterSlice = createSlice({
-  name: 'counter',
-  initialState: { value: 0 },
-  reducers: {
-    increment(state) { state.value += 1 },
-    decrement(state) { state.value -= 1 },
-    incrementByAmount(state, action) { state.value += action.payload }
-  }
-})
-
-export const { increment, decrement, incrementByAmount } = counterSlice.actions
+/**
+ * Redux Store Configuration
+ * Centralized state management cho:
+ * - auth: user authentication & authorization
+ * - cart: shopping cart management
+ */
 
 const store = configureStore({
   reducer: {
-    counter: counterSlice.reducer
-  }
+    auth: authReducer,
+    cart: cartReducer
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore these action types for serializable check
+        ignoredActions: ['auth/login', 'auth/setUser'],
+        // Ignore these field paths in all actions
+        ignoredActionPaths: ['payload.timestamp'],
+        // Ignore these paths in the state
+        ignoredPaths: ['auth.user.createdAt', 'auth.user.updatedAt']
+      }
+    })
 })
 
 export default store
