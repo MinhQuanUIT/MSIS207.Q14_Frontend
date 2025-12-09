@@ -99,6 +99,13 @@ export const styles = {
     flexDirection: 'column',
     gap: 16
   },
+  reviewForm: {
+    padding: 24,
+    backgroundColor: '#f8f9fa',
+    border: '1px solid #e0e0e0',
+    borderRadius: 8,
+    marginBottom: 24
+  },
   reviewCard: {
     padding: 16,
     border: '1px solid #f0f0f0',
@@ -106,8 +113,8 @@ export const styles = {
   },
   reviewHeader: {
     display: 'flex',
-    alignItems: 'center',
-    gap: 12,
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
     marginBottom: 12
   },
   reviewerName: {

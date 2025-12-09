@@ -17,10 +17,13 @@ export default function BooksManagementPage() {
   const loadBooks = async () => {
     try {
       setLoading(true)
-      const response = await bookService.getAll()
-      setBooks(response.data)
+      const response = await bookService.getAll({ limit: 1000 }) // Load all for admin
+      // Backend returns: {success: true, data: [...books], total, count}
+      const data = response.data.data || response.data
+      setBooks(Array.isArray(data) ? data : [])
     } catch (error) {
       message.error('Không thể tải danh sách sách')
+      console.error('Load books error:', error)
     } finally {
       setLoading(false)
     }
@@ -67,8 +70,31 @@ export default function BooksManagementPage() {
   const columns = [
     { title: 'Tên sách', dataIndex: 'title', key: 'title' },
     { title: 'Tác giả', dataIndex: 'author', key: 'author' },
-    { title: 'Giá', dataIndex: 'price', key: 'price' },
-    { title: 'Đã bán', dataIndex: 'sold', key: 'sold' },
+    { 
+      title: 'Giá', 
+      dataIndex: 'price', 
+      key: 'price',
+      render: (price) => `${price?.toLocaleString('vi-VN')}đ`
+    },
+    { 
+      title: 'Đã bán', 
+      dataIndex: 'sales', // Backend uses 'sales' not 'sold'
+      key: 'sales',
+      defaultSortOrder: 'descend',
+      sorter: (a, b) => (a.sales || 0) - (b.sales || 0)
+    },
+    {
+      title: 'Tồn kho',
+      dataIndex: 'stock',
+      key: 'stock',
+      sorter: (a, b) => (a.stock || 0) - (b.stock || 0)
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'inStock',
+      key: 'inStock',
+      render: (inStock) => inStock ? '✅ Còn hàng' : '❌ Hết hàng'
+    },
     {
       title: 'Hành động',
       key: 'actions',
@@ -103,20 +129,28 @@ export default function BooksManagementPage() {
         onOk={() => form.submit()}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item name="title" label="Tên sách" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item name="title" label="Tên sách" rules={[{ required: true, message: 'Vui lòng nhập tên sách' }]}>
+            <Input placeholder="Nhập tên sách" />
           </Form.Item>
-          <Form.Item name="author" label="Tác giả" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item name="author" label="Tác giả" rules={[{ required: true, message: 'Vui lòng nhập tác giả' }]}>
+            <Input placeholder="Nhập tên tác giả" />
           </Form.Item>
-          <Form.Item name="price" label="Giá" rules={[{ required: true }]}>
-            <InputNumber style={{ width: '100%' }} />
+          <Form.Item name="price" label="Giá" rules={[{ required: true, message: 'Vui lòng nhập giá' }]}>
+            <InputNumber 
+              style={{ width: '100%' }} 
+              formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={value => value.replace(/\$\s?|(,*)/g, '')}
+              min={0}
+            />
+          </Form.Item>
+          <Form.Item name="stock" label="Số lượng tồn kho" rules={[{ required: true, message: 'Vui lòng nhập số lượng' }]}>
+            <InputNumber style={{ width: '100%' }} min={0} />
           </Form.Item>
           <Form.Item name="image" label="URL hình ảnh">
-            <Input />
+            <Input placeholder="https://example.com/image.jpg" />
           </Form.Item>
           <Form.Item name="description" label="Mô tả">
-            <Input.TextArea rows={4} />
+            <Input.TextArea rows={4} placeholder="Mô tả chi tiết về sách..." />
           </Form.Item>
         </Form>
       </Modal>

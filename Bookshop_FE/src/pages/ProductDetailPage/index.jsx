@@ -1,7 +1,10 @@
-import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { Breadcrumb, Divider, Tabs, message } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Breadcrumb, Divider, Tabs, message, Spin } from 'antd'
 import { HomeOutlined } from '@ant-design/icons'
+import { useDispatch } from 'react-redux'
+import { addItem } from '../../store/slices/cartSlice'
+import { bookService } from '../../services/book.service'
 import ProductImages from '../../components/ProductDetail/ProductImages'
 import ProductInfo from '../../components/ProductDetail/ProductInfo'
 import ProductSpecs from '../../components/ProductDetail/ProductSpecs'
@@ -12,40 +15,131 @@ import { styles } from './styles'
 
 const { TabPane } = Tabs
 
-const MOCK_PRODUCT = {
-  id: 'mock-book-1',
-  title: 'Clean Code: A Handbook of Agile Software Craftsmanship',
-  author: 'Robert C. Martin',
-  category: 'Lập trình',
-  rating: 4.7,
-  sold: 12345,
-  price: 250000,
-  oldPrice: 320000,
-  badges: ['Bìa mềm', 'Tặng Bookmark'],
-  stock: 25,
-  images: [
-    '/images/mock/clean-code-1.jpg',
-    '/images/mock/clean-code-2.jpg',
-    '/images/mock/clean-code-3.jpg'
-  ],
-  isbn: '0132350882',
-  pages: 464,
-  publisher: 'Prentice Hall',
-  description: '<p>Clean Code is divided into three parts. The first describes the principles, patterns, and practices of writing clean code.</p>'
-}
-
 export default function ProductDetailPage() {
   const { id } = useParams()
-  // UI-only: show mock product. If you want different mock per id, add logic.
-  const [product] = useState(MOCK_PRODUCT)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const [product, setProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(0)
 
+  useEffect(() => {
+    loadProduct()
+  }, [id])
+
+  const loadProduct = async () => {
+    try {
+      setLoading(true)
+      const response = await bookService.getById(id)
+      const bookData = response.data.data || response.data
+      
+      // Extract category from description if available
+      let category = 'Sách'
+      if (bookData.description) {
+        const categoryMatch = bookData.description.match(/Category:\s*([^\n]+)/i)
+        if (categoryMatch) {
+          const categoryMap = {
+            'fiction': 'Văn Học',
+            'fantasy': 'Kỳ Ảo',
+            'scifi': 'Khoa Học Viễn Tưởng',
+            'mystery': 'Trinh Thám',
+            'business': 'Kinh Doanh',
+            'technology': 'Công Nghệ',
+            'history': 'Lịch Sử',
+            'biography': 'Tiểu Sử',
+            'psychology': 'Tâm Lý',
+            'science': 'Khoa Học'
+          }
+          const catKey = categoryMatch[1].toLowerCase().trim()
+          category = categoryMap[catKey] || categoryMatch[1]
+        }
+      }
+      
+      // Transform backend data to frontend format
+      const transformedProduct = {
+        id: bookData._id,
+        title: bookData.title,
+        author: bookData.author,
+        category: category,
+        rating: bookData.averageRating || bookData.rating || 0,
+        sold: bookData.sales || bookData.sold || 0,
+        price: bookData.price,
+        oldPrice: bookData.oldPrice || null,
+        badges: bookData.inStock ? ['Còn hàng'] : ['Hết hàng'],
+        stock: bookData.stock || 0,
+        images: bookData.image ? [bookData.image] : ['https://placehold.co/400x600?text=Book'],
+        isbn: bookData.bookID || '',
+        pages: 0,
+        publisher: '',
+        description: bookData.description || 'Chưa có mô tả',
+        reviews: bookData.reviews || []
+      }
+      
+      setProduct(transformedProduct)
+    } catch (error) {
+      console.error('Error loading product:', error)
+      message.error('Không thể tải thông tin sản phẩm')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleAddToCart = (qty = 1) => {
-    message.success(`Đã thêm ${qty} sản phẩm (mock) vào giỏ hàng`)
+    if (!product) return
+    
+    // Create book object for cart
+    const bookForCart = {
+      _id: product.id,
+      title: product.title,
+      author: product.author,
+      price: product.price,
+      image: product.images[0],
+      stock: product.stock,
+      inStock: product.stock > 0
+    }
+    
+    dispatch(addItem({ book: bookForCart, quantity: qty }))
+    message.success(`Đã thêm ${qty} sản phẩm vào giỏ hàng`)
   }
 
   const handleBuyNow = (qty = 1) => {
-    message.info(`Mua ngay ${qty} sản phẩm (mock) — chuyển tới thanh toán giả lập`)
+    if (!product) return
+    
+    // Create book object for cart
+    const bookForCart = {
+      _id: product.id,
+      title: product.title,
+      author: product.author,
+      price: product.price,
+      image: product.images[0],
+      stock: product.stock,
+      inStock: product.stock > 0
+    }
+    
+    dispatch(addItem({ book: bookForCart, quantity: qty }))
+    message.success(`Đã thêm ${qty} sản phẩm vào giỏ hàng`)
+    
+    // Navigate to checkout page
+    setTimeout(() => {
+      navigate('/checkout')
+    }, 500)
+  }
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '100px 0' }}>
+        <Spin size="large" />
+        <p style={{ marginTop: 20 }}>Đang tải thông tin sản phẩm...</p>
+      </div>
+    )
+  }
+
+  if (!product) {
+    return (
+      <div style={{ textAlign: 'center', padding: '100px 0' }}>
+        <p>Không tìm thấy sản phẩm</p>
+      </div>
+    )
   }
 
   return (
@@ -130,7 +224,11 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Similar Products Section */}
-      <SimilarProducts category={product.category} />
+      <SimilarProducts 
+        currentBookId={product.id} 
+        author={product.author} 
+        category={product.category} 
+      />
 
       {/* Customer Reviews Section */}
       <CustomerReviews productRating={product.rating} totalReviews={152} />

@@ -72,3 +72,5 @@ export const orderService = {
     return api.delete(`/orders/${id}`)
   }
 }
+
+export default orderService

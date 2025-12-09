@@ -5,15 +5,23 @@
   gap: 6px 10px;
   align-items: center;
 }
+
 .type-tag {
   display: inline-block;
-  background: transparent;
-  color: #666;
-  padding: 3px 6px;
+  background: #f0f0f0;
+  color: #555;
+  padding: 4px 12px;
+  border: 1px solid #d9d9d9;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 13px;
   white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
+
 .type-tag:hover {
-  color: #111;
+  background: #1890ff;
+  color: white;
+  border-color: #1890ff;
+  transform: translateY(-1px);
 }

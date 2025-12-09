@@ -3,7 +3,7 @@
   margin: 12px 0 20px 0;
 }
 .slick-slide {
-  padding: 0 8px;
+  padding: 0 6px;
   box-sizing: border-box;
 }
 .slide-item {
@@ -11,13 +11,13 @@
 }
 .slide-card {
   background: #fff;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  height: 260px;
+  height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 6px rgba(16,24,40,0.06);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 .slide-image {
   width: 100%;

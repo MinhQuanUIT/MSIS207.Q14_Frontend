@@ -1,83 +1,158 @@
-import React, { useState } from 'react'
-import { Typography, Row, Col, Button } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Typography, Row, Col, Button, Spin, message } from 'antd'
+import { useSearchParams } from 'react-router-dom'
 import SliderComponent from '../../components/SliderComponent/SliderComponent'
 import CardComponent from '../../components/CardComponent/CardComponent'
 import NavbarComponent from '../../components/NavbarComponent/NavbarComponent'
+import { bookService } from '../../services/book.service'
 import { styles, gridConfig } from './styles'
 
-const { Title, Paragraph } = Typography
-
-// Mock data - will be replaced with API call from backend
-const generateMockProducts = (count) => {
-  return Array.from({ length: count }, (_, i) => ({
-    _id: `product-${i}`,
-    title: `Sách mẫu ${i + 1}`,
-    author: `Tác giả ${i + 1}`,
-    desc: `Mô tả sản phẩm ${i + 1}`,
-    image: 'https://via.placeholder.com/240x220/f0f0f0/666?text=Product+Image',
-    price: `${(Math.random() * 200000 + 50000).toFixed(0)}đ`,
-    oldPrice: Math.random() > 0.5 ? `${(Math.random() * 300000 + 100000).toFixed(0)}đ` : '',
-    rating: (Math.random() * 1 + 4).toFixed(1),
-    sold: Math.floor(Math.random() * 10000),
-    badges: Math.random() > 0.5 ? ['CHÍNH HÃNG'] : [],
-    promos: Math.random() > 0.5 ? ['Giảm 5%'] : [],
-    shipping: Math.random() > 0.6 ? 'Giao siêu tốc 2h' : ''
-  }))
-}
-
-const allProducts = generateMockProducts(24) // Generate 24 mock products for demo
+const { Title } = Typography
 
 export default function HomePage() {
-  const [visibleCount, setVisibleCount] = useState(16) // Show at least 4 rows (16 products)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [books, setBooks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalBooks, setTotalBooks] = useState(0)
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '')
+  const BOOKS_PER_PAGE = 16
 
-  const showMore = () => setVisibleCount((c) => Math.min(c + 4, allProducts.length))
+  useEffect(() => {
+    loadBooks()
+  }, [currentPage, selectedCategory])
+
+  // Sync category from URL params
+  useEffect(() => {
+    const categoryParam = searchParams.get('category')
+    if (categoryParam !== selectedCategory) {
+      setSelectedCategory(categoryParam || '')
+      setCurrentPage(1)
+    }
+  }, [searchParams.get('category')]) // Only depend on category param, not whole searchParams
+
+  const loadBooks = async () => {
+    try {
+      setLoading(true)
+      const params = {
+        page: currentPage,
+        limit: BOOKS_PER_PAGE
+      }
+
+      // Add category filter if selected
+      // Backend has Vietnamese category field: vanhoc, kyao, kinhdoanh, etc.
+      if (selectedCategory) {
+        // Map frontend category keys to backend Vietnamese categories
+        const categoryMap = {
+          'fiction': 'vanhoc',
+          'fantasy': 'kyao',
+          'scifi': 'khoahoc-vientuong',
+          'mystery': 'trinhtham',
+          'business': 'kinhdoanh',
+          'technology': 'congnghe',
+          'history': 'lichsu',
+          'biography': 'tieusu',
+          'psychology': 'tamly',
+          'science': 'khoahoc-tunhien'
+        }
+        params.search = categoryMap[selectedCategory] || selectedCategory
+      }
+
+      const response = await bookService.getAll(params)
+      const booksData = response.data.data || response.data
+      
+      // Append books if loading more, replace if new page/category
+      if (currentPage === 1) {
+        setBooks(booksData)
+      } else {
+        setBooks(prev => [...prev, ...booksData])
+      }
+      setTotalBooks(response.data.total || booksData.length)
+    } catch (error) {
+      console.error('Error loading books:', error)
+      message.error('Không thể tải danh sách sách')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCategorySelect = (categoryKey) => {
+    setSelectedCategory(categoryKey)
+    setCurrentPage(1)
+    setBooks([]) // Clear books to show loading state
+    setSearchParams(categoryKey ? { category: categoryKey } : {})
+  }
+
+  const showMore = () => {
+    setCurrentPage(prev => prev + 1)
+  }
+
+  const hasMoreBooks = books.length < totalBooks
 
   return (
     <div style={styles.container}>
-      <Title level={3} style={styles.pageTitle}>Home</Title>
+      <Title level={3} style={styles.pageTitle}>Trang Chủ</Title>
 
       <Row gutter={gridConfig.gutter}>
         <Col {...gridConfig.sidebarSpan} style={styles.sidebarCol}>
-          <NavbarComponent />
+          <NavbarComponent onCategorySelect={handleCategorySelect} />
         </Col>
 
         <Col {...gridConfig.contentSpan}>
           <SliderComponent />
 
           <div style={styles.featuredSection}>
-            <Title level={4} style={styles.sectionTitle}>Featured Products</Title>
-            <Row gutter={gridConfig.gutter}>
-              {allProducts.slice(0, visibleCount).map((p) => (
-                <Col key={p._id} {...gridConfig.cardSpan}>
-                  <CardComponent
-                    _id={p._id}
-                    title={p.title}
-                    author={p.author}
-                    description={p.desc}
-                    image={p.image}
-                    price={p.price}
-                    oldPrice={p.oldPrice}
-                    rating={p.rating}
-                    sold={p.sold}
-                    badges={p.badges}
-                    promos={p.promos}
-                    shipping={p.shipping}
-                  />
-                </Col>
-              ))}
-            </Row>
-
-            {visibleCount < allProducts.length && (
-              <div style={styles.loadMoreContainer}>
-                <Button 
-                  onClick={showMore} 
-                  type="default" 
-                  shape="round"
-                  style={styles.loadMoreButton}
-                >
-                  Xem Thêm
-                </Button>
+            <Title level={4} style={styles.sectionTitle}>
+              {selectedCategory ? 'Sách Theo Thể Loại' : 'Sách Nổi Bật'}
+            </Title>
+            
+            {loading && currentPage === 1 ? (
+              <div style={{ textAlign: 'center', padding: '50px 0' }}>
+                <Spin size="large" />
+                <p>Đang tải sách...</p>
               </div>
+            ) : (
+              <>
+                <Row gutter={gridConfig.gutter}>
+                  {books.map((book) => (
+                    <Col key={book._id} {...gridConfig.cardSpan}>
+                      <CardComponent
+                        _id={book._id}
+                        title={book.title}
+                        author={book.author}
+                        description={book.description || 'Chưa có mô tả'}
+                        image={book.image || 'https://placehold.co/240x320/e0e0e0/666?text=No+Image'}
+                        price={book.price}
+                        oldPrice={book.oldPrice}
+                        rating={book.averageRating || 0}
+                        sold={book.sales || 0}
+                        badges={book.inStock ? ['Còn hàng'] : ['Hết hàng']}
+                        promos={book.stock > 0 && book.stock < 10 ? ['Sắp hết'] : []}
+                      />
+                    </Col>
+                  ))}
+                </Row>
+
+                {books.length === 0 && !loading && (
+                  <div style={{ textAlign: 'center', padding: '50px 0', color: '#999' }}>
+                    <p>Không tìm thấy sách nào</p>
+                  </div>
+                )}
+
+                {hasMoreBooks && (
+                  <div style={styles.loadMoreContainer}>
+                    <Button 
+                      onClick={showMore} 
+                      type="default" 
+                      shape="round"
+                      style={styles.loadMoreButton}
+                      loading={loading && currentPage > 1}
+                    >
+                      Xem Thêm
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </Col>

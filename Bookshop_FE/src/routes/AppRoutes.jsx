@@ -2,11 +2,13 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
 import AdminLayout from '../layouts/AdminLayout'
+import ProtectedRoute from '../components/common/ProtectedRoute'
 
 // User pages
-import HomePage from '../pages/HomePage'
-import AboutPage from '../pages/AboutPage'
-import ProductDetailPage from '../pages/ProductDetailPage'
+import HomePage from '../pages/HomePage/index.jsx'
+import AboutPage from '../pages/AboutPage/index.jsx'
+import ProductDetailPage from '../pages/ProductDetailPage/index.jsx'
+import TestPage from '../pages/TestPage.jsx'
 
 // Features
 import BookListPage from '../features/books/BookListPage'
@@ -14,6 +16,8 @@ import BookDetailPage from '../features/books/BookDetailPage'
 import LoginPage from '../features/auth/LoginPage'
 import RegisterPage from '../features/auth/RegisterPage'
 import CartPage from '../features/cart/CartPage'
+import CheckoutPage from '../features/checkout/CheckoutPage'
+import AccountPage from '../features/account/AccountPage'
 
 // Admin features
 import DashboardPage from '../features/admin/DashboardPage'
@@ -25,6 +29,9 @@ import ReportsPage from '../features/admin/ReportsPage'
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* Test Route - Trang test đơn giản */}
+      <Route path="/test" element={<TestPage />} />
+      
       {/* User Layout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
@@ -38,8 +45,18 @@ export default function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         
+        {/* Account - Protected */}
+        <Route path="/account" element={
+          <ProtectedRoute>
+            <AccountPage />
+          </ProtectedRoute>
+        } />
+        
         {/* Cart */}
         <Route path="/cart" element={<CartPage />} />
+        
+        {/* Checkout */}
+        <Route path="/checkout" element={<CheckoutPage />} />
       </Route>
 
       {/* Admin Layout */}

@@ -1,62 +1,36 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Table, Button, InputNumber, Typography, message, Empty } from 'antd'
-import { DeleteOutlined } from '@ant-design/icons'
+import { DeleteOutlined, ShoppingOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
-import { cartService } from '../../services/cart.service'
+import { useSelector, useDispatch } from 'react-redux'
+import { removeItem, updateQuantity, selectCartItems } from '../../store/slices/cartSlice'
+import { formatPrice } from '../../utils/formatPrice'
 import './CartPage.css'
 
 const { Title, Text } = Typography
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState([])
-  const [loading, setLoading] = useState(true)
+  const cartItems = useSelector(selectCartItems)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem('token')
-    if (!token) {
-      message.warning('Vui lòng đăng nhập để xem giỏ hàng')
-      navigate('/login')
+  const handleUpdateQuantity = (itemId, quantity) => {
+    if (quantity < 1) {
+      message.warning('Số lượng phải lớn hơn 0')
       return
     }
-    loadCart()
-  }, [navigate])
-
-  const loadCart = async () => {
-    try {
-      setLoading(true)
-      const response = await cartService.getCart()
-      setCartItems(response.data.items || [])
-    } catch (error) {
-      message.error('Không thể tải giỏ hàng')
-    } finally {
-      setLoading(false)
-    }
+    dispatch(updateQuantity({ itemId, quantity }))
+    message.success('Đã cập nhật số lượng')
   }
 
-  const handleUpdateQuantity = async (itemId, quantity) => {
-    try {
-      await cartService.updateItem(itemId, quantity)
-      loadCart()
-    } catch (error) {
-      message.error('Không thể cập nhật số lượng')
-    }
-  }
-
-  const handleRemoveItem = async (itemId) => {
-    try {
-      await cartService.removeItem(itemId)
-      message.success('Đã xóa sản phẩm khỏi giỏ hàng')
-      loadCart()
-    } catch (error) {
-      message.error('Không thể xóa sản phẩm')
-    }
+  const handleRemoveItem = (itemId) => {
+    dispatch(removeItem(itemId))
+    message.success('Đã xóa sản phẩm khỏi giỏ hàng')
   }
 
   const calculateTotal = () => {
     return cartItems.reduce((sum, item) => {
-      const price = parseFloat(item.price.replace(/[^\d]/g, ''))
+      const price = typeof item.price === 'number' ? item.price : parseFloat(item.price.toString().replace(/[^\d]/g, ''))
       return sum + (price * item.quantity)
     }, 0)
   }
@@ -68,9 +42,9 @@ export default function CartPage() {
       key: 'book',
       render: (book) => (
         <div className="cart-product">
-          <img src={book.image} alt={book.title} />
-          <div>
-            <div>{book.title}</div>
+          <img src={book.image || 'https://placehold.co/80x100?text=Book'} alt={book.title} style={{ width: 80, height: 100, objectFit: 'cover' }} />
+          <div style={{ marginLeft: 12 }}>
+            <div style={{ fontWeight: 500 }}>{book.title}</div>
             <Text type="secondary">{book.author}</Text>
           </div>
         </div>
@@ -80,6 +54,7 @@ export default function CartPage() {
       title: 'Đơn giá',
       dataIndex: 'price',
       key: 'price',
+      render: (price) => formatPrice(typeof price === 'number' ? price : parseFloat(price.toString().replace(/[^\d]/g, '')))
     },
     {
       title: 'Số lượng',
@@ -88,7 +63,7 @@ export default function CartPage() {
       render: (quantity, record) => (
         <InputNumber
           min={1}
-          max={99}
+          max={record.book.stock || 99}
           value={quantity}
           onChange={(value) => handleUpdateQuantity(record._id, value)}
         />
@@ -96,11 +71,11 @@ export default function CartPage() {
     },
     {
       title: 'Thành tiền',
-      key: 'subtotal',
+      key: 'total',
       render: (_, record) => {
-        const price = parseFloat(record.price.replace(/[^\d]/g, ''))
-        return `${(price * record.quantity).toLocaleString('vi-VN')}đ`
-      },
+        const price = typeof record.price === 'number' ? record.price : parseFloat(record.price.toString().replace(/[^\d]/g, ''))
+        return formatPrice(price * record.quantity)
+      }
     },
     {
       title: '',
@@ -111,42 +86,53 @@ export default function CartPage() {
           danger
           icon={<DeleteOutlined />}
           onClick={() => handleRemoveItem(record._id)}
-        />
+        >
+          Xóa
+        </Button>
       ),
     },
   ]
 
   return (
     <div className="cart-page">
-      <div className="container">
-        <Title level={2}>Giỏ hàng</Title>
-
-        {cartItems.length === 0 ? (
-          <Empty description="Giỏ hàng trống" />
-        ) : (
-          <>
-            <Table
-              columns={columns}
-              dataSource={cartItems}
-              rowKey="_id"
-              loading={loading}
-              pagination={false}
-            />
-
-            <div className="cart-summary">
-              <div className="cart-total">
-                <Text strong style={{ fontSize: 18 }}>Tổng cộng:</Text>
-                <Text strong style={{ fontSize: 24, color: '#ff4d4f' }}>
-                  {calculateTotal().toLocaleString('vi-VN')}đ
-                </Text>
-              </div>
-              <Button type="primary" size="large" style={{ marginTop: 16 }}>
-                Thanh toán
-              </Button>
+      <Title level={2}>Giỏ hàng</Title>
+      
+      {cartItems.length === 0 ? (
+        <Empty 
+          image={<ShoppingOutlined style={{ fontSize: 64, color: '#ccc' }} />}
+          description="Giỏ hàng trống"
+        >
+          <Button type="primary" onClick={() => navigate('/books')}>
+            Tiếp tục mua sắm
+          </Button>
+        </Empty>
+      ) : (
+        <>
+          <Table
+            columns={columns}
+            dataSource={cartItems}
+            rowKey="_id"
+            pagination={false}
+          />
+          
+          <div className="cart-summary">
+            <div className="summary-row">
+              <Text strong>Tổng cộng:</Text>
+              <Title level={3} style={{ color: '#ff4d4f', margin: 0 }}>
+                {formatPrice(calculateTotal())}
+              </Title>
             </div>
-          </>
-        )}
-      </div>
+            <Button 
+              type="primary" 
+              size="large"
+              onClick={() => navigate('/checkout')}
+              style={{ marginTop: 16 }}
+            >
+              Tiến hành thanh toán
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   )
 }

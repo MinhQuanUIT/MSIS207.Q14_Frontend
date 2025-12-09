@@ -2,6 +2,7 @@ import React from 'react'
 import { Card } from 'antd'
 import { StarFilled } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { formatPrice } from '../../utils/formatPrice'
 import './CardComponent.css'
 
 const { Meta } = Card
@@ -15,11 +16,11 @@ export default function CardComponent({
 	badges = [],
 	promos = [],
 	shipping = '',
-	image = 'https://via.placeholder.com/240x220/f0f0f0/666?text=Book',
+	image = 'https://placehold.co/240x220/f0f0f0/666?text=Book',
 	width = 240,
 	hoverable = true,
-	price = '',
-	oldPrice = '',
+	price = null,
+	oldPrice = null,
 	onClick
 }) {
 	const navigate = useNavigate()
@@ -32,12 +33,16 @@ export default function CardComponent({
 		}
 	}
 
+	// Format prices - handle both number and string inputs
+	const formattedPrice = typeof price === 'number' ? formatPrice(price) : price
+	const formattedOldPrice = typeof oldPrice === 'number' ? formatPrice(oldPrice) : oldPrice
+
 	return (
 		<Card
 			hoverable={hoverable}
 			className="product-card"
 			style={{ width, height: '100%', cursor: 'pointer' }}
-			bodyStyle={{ padding: 12, display: 'flex', flexDirection: 'column', height: '100%' }}
+			styles={{ body: { padding: 12, display: 'flex', flexDirection: 'column', height: '100%' } }}
 			onClick={handleClick}
 			cover={
 				<div className="cover-wrapper">
@@ -84,11 +89,11 @@ export default function CardComponent({
 			</div>
 
 			{/* price area pinned above footer so prices align */}
-			{(price || oldPrice) && (
+			{(formattedPrice || formattedOldPrice) && (
 				<div className="card-bottom">
 					<div className="card-price-row">
-						{price ? <div className="card-price">{price}</div> : null}
-						{oldPrice ? <div className="card-old-price">{oldPrice}</div> : null}
+						{formattedPrice ? <div className="card-price">{formattedPrice}</div> : null}
+						{formattedOldPrice ? <div className="card-old-price">{formattedOldPrice}</div> : null}
 					</div>
 				</div>
 			)}

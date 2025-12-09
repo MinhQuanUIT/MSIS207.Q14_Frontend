@@ -1,9 +1,11 @@
 // Styles for HomePage using CSS-in-JS pattern
 export const styles = {
   container: {
-    padding: 20,
+    padding: '20px 30px',
     background: '#f5f5f5',
-    minHeight: '100vh'
+    minHeight: '100vh',
+    maxWidth: 1400,
+    margin: '0 auto'
   },
   
   pageTitle: {
@@ -12,7 +14,7 @@ export const styles = {
   },
   
   sidebarCol: {
-    maxWidth: 280
+    paddingRight: 24
   },
   
   mainContent: {
@@ -61,8 +63,8 @@ export const breakpoints = {
 
 // Grid gutter configuration
 export const gridConfig = {
-  gutter: [16, 16],
-  sidebarSpan: { xs: 24, sm: 24, md: 6, lg: 6 },
-  contentSpan: { xs: 24, sm: 24, md: 18, lg: 18 },
-  cardSpan: { xs: 24, sm: 12, md: 12, lg: 6 }
+  gutter: [24, 24],
+  sidebarSpan: { xs: 24, sm: 24, md: 6, lg: 5, xl: 4 },
+  contentSpan: { xs: 24, sm: 24, md: 18, lg: 19, xl: 20 },
+  cardSpan: { xs: 12, sm: 12, md: 8, lg: 6, xl: 6 }
 }

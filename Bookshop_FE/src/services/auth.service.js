@@ -5,6 +5,7 @@
  */
 
 import api from './api'
+import mockAuthService from './mockAuth.service'
 
 export const authService = {
   /**
@@ -15,12 +16,18 @@ export const authService = {
    * @returns {Promise<{token: string, role: string}>}
    */
   login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials)
-    const { token, role } = response.data
-    // Save token and role to localStorage
-    localStorage.setItem('token', token)
-    localStorage.setItem('role', role)
-    return response
+    try {
+      const response = await api.post('/auth/login', credentials)
+      const { token, role } = response.data
+      // Save token and role to localStorage
+      localStorage.setItem('token', token)
+      localStorage.setItem('role', role)
+      return response
+    } catch (error) {
+      // If backend not available, use mock
+      console.warn('Backend not available, using mock auth')
+      return mockAuthService.login(credentials)
+    }
   },
 
   /**
@@ -33,12 +40,18 @@ export const authService = {
    * @returns {Promise<{token: string, role: string}>}
    */
   register: async (userData) => {
-    const response = await api.post('/auth/register', userData)
-    const { token, role } = response.data
-    // Save token and role to localStorage
-    localStorage.setItem('token', token)
-    localStorage.setItem('role', role)
-    return response
+    try {
+      const response = await api.post('/auth/register', userData)
+      const { token, role } = response.data
+      // Save token and role to localStorage
+      localStorage.setItem('token', token)
+      localStorage.setItem('role', role)
+      return response
+    } catch (error) {
+      // If backend not available, use mock
+      console.warn('Backend not available, using mock auth')
+      return mockAuthService.register(userData)
+    }
   },
 
   /**

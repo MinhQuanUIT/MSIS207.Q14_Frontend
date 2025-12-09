@@ -1,0 +1,81 @@
+.filter-sidebar {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.filter-header h5 {
+  margin: 0;
+}
+
+.filter-section {
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 14px !important;
+  font-weight: 600;
+  margin-bottom: 12px !important;
+  color: #333;
+}
+
+.price-display {
+  text-align: center;
+  margin-top: 12px;
+  font-weight: 600;
+  color: #ff4d4f;
+  font-size: 14px;
+}
+
+.rating-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.rating-option:hover {
+  border-color: #1890ff;
+  background: #f0f5ff;
+}
+
+.rating-option.active {
+  border-color: #1890ff;
+  background: #e6f7ff;
+  font-weight: 600;
+}
+
+.rating-text {
+  font-size: 13px;
+  color: #666;
+  flex: 1;
+}
+
+.rating-option.active .rating-text {
+  color: #1890ff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filter-sidebar {
+    margin-bottom: 20px;
+  }
+}

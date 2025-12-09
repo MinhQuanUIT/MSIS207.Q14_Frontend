@@ -1,85 +1,80 @@
-import React from 'react'
-import { Rate } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Rate, Spin } from 'antd'
 import { styles } from './styles'
 import { formatPrice } from '../../../utils/formatPrice'
+import { bookService } from '../../../services/book.service'
 
-// Mock data sản phẩm tương tự
-const SIMILAR_PRODUCTS = [
-  {
-    id: 'book-2',
-    title: 'Sách Tâm Lý Học Về Tiền',
-    image: '/images/mock/book-2.jpg',
-    price: 90516,
-    oldPrice: 120000,
-    rating: 5,
-    isAd: true
-  },
-  {
-    id: 'book-3',
-    title: 'Sách Kiếm Soát Tài Chính: Quản Lý Chi Tiêu Thông Minh',
-    image: '/images/mock/book-3.jpg',
-    price: 120384,
-    oldPrice: null,
-    rating: 5,
-    isAd: false
-  },
-  {
-    id: 'book-4',
-    title: 'Sách Năng Lượng Của Tiền',
-    image: '/images/mock/book-4.jpg',
-    price: 128136,
-    oldPrice: null,
-    rating: 4.5,
-    isAd: true
-  },
-  {
-    id: 'book-5',
-    title: 'Hiểu Đúng Về Tiền',
-    image: '/images/mock/book-5.jpg',
-    price: 42240,
-    oldPrice: null,
-    rating: 5,
-    isAd: false
-  },
-  {
-    id: 'book-6',
-    title: 'Sách Tiền Tệ Và Chuyển Làm Giàu',
-    image: '/images/mock/book-6.jpg',
-    price: 86400,
-    oldPrice: null,
-    rating: 4,
-    isAd: false
-  },
-  {
-    id: 'book-7',
-    title: 'Sách Kỹ năng lập kế hoạch và quản lý thời gian',
-    image: '/images/mock/book-7.jpg',
-    price: 84132,
-    oldPrice: null,
-    rating: 4,
-    isAd: true
-  },
-  {
-    id: 'book-8',
-    title: 'Sách Thiêu Tiền',
-    image: '/images/mock/book-8.jpg',
-    price: 105840,
-    oldPrice: null,
-    rating: 5,
-    isAd: false
-  },
-  {
-    id: 'book-9',
-    title: 'Sách Kế Hoạch Quản Lý Tài Chính Cá Nhân',
-    image: '/images/mock/book-9.jpg',
-    price: 100548,
-    oldPrice: null,
-    rating: 5,
-    isAd: false
+export default function SimilarProducts({ currentBookId, author, category }) {
+  const [similarBooks, setSimilarBooks] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadSimilarBooks()
+  }, [currentBookId, author])
+
+  const loadSimilarBooks = async () => {
+    try {
+      setLoading(true)
+      let books = []
+
+      // First, try to get books by same author
+      if (author) {
+        const authorResponse = await bookService.getAll({ 
+          search: author, 
+          limit: 10 
+        })
+        const authorBooks = (authorResponse.data.data || authorResponse.data || [])
+          .filter(book => book._id !== currentBookId) // Exclude current book
+        books = [...authorBooks]
+      }
+
+      // If not enough books, add books from same category
+      if (books.length < 5 && category) {
+        const categoryResponse = await bookService.getAll({ 
+          search: category, 
+          limit: 10 
+        })
+        const categoryBooks = (categoryResponse.data.data || categoryResponse.data || [])
+          .filter(book => 
+            book._id !== currentBookId && 
+            !books.find(b => b._id === book._id)
+          )
+        books = [...books, ...categoryBooks]
+      }
+
+      // If still not enough, get random books
+      if (books.length < 5) {
+        const randomResponse = await bookService.getAll({ limit: 10 })
+        const randomBooks = (randomResponse.data.data || randomResponse.data || [])
+          .filter(book => 
+            book._id !== currentBookId && 
+            !books.find(b => b._id === book._id)
+          )
+        books = [...books, ...randomBooks]
+      }
+
+      // Take only first 5 books
+      setSimilarBooks(books.slice(0, 5))
+    } catch (error) {
+      console.error('Error loading similar books:', error)
+      setSimilarBooks([])
+    } finally {
+      setLoading(false)
+    }
   }
-]
 
-export default function SimilarProducts({ category }) {
+  if (loading) {
+    return (
+      <div style={{ ...styles.container, textAlign: 'center', padding: '40px 0' }}>
+        <Spin size="large" />
+        <p>Đang tải sản phẩm tương tự...</p>
+      </div>
+    )
+  }
+
+  if (similarBooks.length === 0) {
+    return null // Don't show section if no similar books
+  }
   const calculateDiscount = (oldPrice, newPrice) => {
     if (!oldPrice) return 0
     return Math.round(((oldPrice - newPrice) / oldPrice) * 100)
@@ -90,13 +85,13 @@ export default function SimilarProducts({ category }) {
       <h2 style={styles.header}>Sản phẩm tương tự</h2>
       
       <div style={styles.productGrid}>
-        {SIMILAR_PRODUCTS.slice(0, 5).map((product) => {
-          const discount = calculateDiscount(product.oldPrice, product.price)
+        {similarBooks.map((book) => {
+          const discount = book.oldPrice ? calculateDiscount(book.oldPrice, book.price) : 0
           
           return (
             <a 
-              key={product.id} 
-              href={`/books/${product.id}`}
+              key={book._id} 
+              href={`/books/${book._id}`}
               style={styles.productCard}
               onMouseEnter={(e) => {
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'
@@ -109,29 +104,29 @@ export default function SimilarProducts({ category }) {
             >
               <div style={{ position: 'relative' }}>
                 <img 
-                  src={product.image} 
-                  alt={product.title}
+                  src={book.image || 'https://placehold.co/160x200?text=Book'} 
+                  alt={book.title}
                   style={styles.productImage}
                   onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/160x200?text=Book'
+                    e.target.src = 'https://placehold.co/160x200?text=Book'
                   }}
                 />
-                {product.isAd && <span style={styles.adBadge}>AD</span>}
+                {discount > 0 && <span style={styles.discount}>-{discount}%</span>}
+                {book.inStock === false && <span style={{ ...styles.adBadge, background: '#ff4d4f' }}>Hết hàng</span>}
               </div>
               
-              <div style={styles.productTitle}>{product.title}</div>
+              <div style={styles.productTitle}>{book.title}</div>
+              <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>Tác giả: {book.author}</div>
               
               <div style={styles.ratingRow}>
-                <Rate disabled value={product.rating} style={{ fontSize: 12 }} />
+                <Rate disabled value={book.averageRating || 0} style={{ fontSize: 12 }} />
+                <span style={{ fontSize: 11, color: '#999', marginLeft: 8 }}>Đã bán {book.sales || 0}</span>
               </div>
               
               <div style={styles.priceRow}>
-                <span style={styles.price}>{formatPrice(product.price)}</span>
-                {product.oldPrice && (
-                  <>
-                    <span style={styles.oldPrice}>{formatPrice(product.oldPrice)}</span>
-                    {discount > 0 && <span style={styles.discount}>-{discount}%</span>}
-                  </>
+                <span style={styles.price}>{formatPrice(book.price)}</span>
+                {book.oldPrice && (
+                  <span style={styles.oldPrice}>{formatPrice(book.oldPrice)}</span>
                 )}
               </div>
             </a>
