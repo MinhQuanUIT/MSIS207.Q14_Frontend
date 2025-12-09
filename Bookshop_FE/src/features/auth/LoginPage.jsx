@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Form, Input, message } from 'antd'
 import { useNavigate, Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { login as loginAction } from '../../store/slices/authSlice'
 import { authService } from '../../services/auth.service'
 import loginImage from '../../assets/Images/loginImange.png'
 import './LoginPage.css'
@@ -9,18 +11,21 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const onFinish = async (values) => {
     try {
       setLoading(true)
       const response = await authService.login(values)
-      const { token, role } = response.data
+      const { token, role, user } = response.data
       
       if (!token) {
         throw new Error('Không nhận được token')
       }
       
-      // Token and role are already saved in authService.login()
+      // Update Redux store with login data
+      dispatch(loginAction({ token, role, user }))
+      
       message.success('Đăng nhập thành công!')
       
       // Navigate based on role

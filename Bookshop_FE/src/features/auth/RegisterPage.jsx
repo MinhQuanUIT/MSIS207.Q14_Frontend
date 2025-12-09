@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Form, message } from 'antd'
 import { useNavigate, Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { login as loginAction } from '../../store/slices/authSlice'
 import { authService } from '../../services/auth.service'
 import loginImage from '../../assets/Images/loginImange.png'
 import './RegisterPage.css'
@@ -10,19 +12,22 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const onFinish = async (values) => {
     try {
       setLoading(true)
       const { confirmPassword, ...registerData } = values
       const response = await authService.register(registerData)
-      const { token, role } = response.data
+      const { token, role, user } = response.data
       
       if (!token) {
         throw new Error('Không nhận được token')
       }
       
-      // Token and role are already saved in authService.register()
+      // Update Redux store with login data
+      dispatch(loginAction({ token, role, user }))
+      
       message.success('Đăng ký thành công!')
       
       // Auto-login after successful registration and navigate

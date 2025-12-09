@@ -31,30 +31,49 @@ export default function CheckoutPage() {
 
   const handleFinish = async (values) => {
     try {
-      // Prepare order data
-      const orderData = {
-        items: cartItems.map(item => ({
-          book: item.book._id,
-          quantity: item.quantity,
-          price: typeof item.price === 'number' ? item.price : parseFloat(item.price.toString().replace(/[^\d]/g, ''))
-        })),
-        shippingInfo: {
-          name: values.name,
-          phone: values.phone,
-          email: values.email,
-          address: values.address,
-          city: values.city,
-          district: values.district,
-          ward: values.ward
-        },
-        paymentMethod: paymentMethod,
-        totalPrice: total,
-        shippingFee: shippingFee,
-        notes: values.notes || ''
+      // Validate cart items have book data
+      if (!cartItems || cartItems.length === 0) {
+        message.error('Giỏ hàng trống!')
+        return
       }
 
+      // Check authentication
+      const token = localStorage.getItem('token')
+      if (!token) {
+        message.error('Vui lòng đăng nhập để đặt hàng!')
+        navigate('/login')
+        return
+      }
+
+      // Prepare order data matching backend schema exactly
+      const orderData = {
+        items: cartItems.map(item => {
+          // Ensure book exists and has _id
+          if (!item.book || !item.book._id) {
+            throw new Error('Thông tin sản phẩm không hợp lệ')
+          }
+          
+          return {
+            book: item.book._id,
+            qty: item.quantity,  // Backend expects "qty" not "quantity"
+            price: typeof item.price === 'number' ? item.price : parseFloat(item.price.toString().replace(/[^\d]/g, ''))
+          }
+        }),
+        shippingInfo: {
+          address: `${values.address}, ${values.ward}, ${values.district}`,
+          city: values.city,
+          phone: values.phone,
+          postalCode: '',  // Optional
+          country: 'Vietnam'  // Optional
+        },
+        totalPrice: total
+      }
+
+      console.log('Sending order data:', orderData)
+
       // Create order via API
-      await orderService.create(orderData)
+      const response = await orderService.create(orderData)
+      console.log('Order created successfully:', response.data)
       
       message.success('Đặt hàng thành công!')
       dispatch(clearCart())
@@ -65,7 +84,15 @@ export default function CheckoutPage() {
       }, 1500)
     } catch (error) {
       console.error('Create order error:', error)
-      message.error(error.response?.data?.message || 'Đặt hàng thất bại. Vui lòng thử lại!')
+      console.error('Error response:', error.response?.data)
+      
+      // Show detailed error message
+      const errorMessage = error.response?.data?.message 
+        || error.response?.data?.msg 
+        || error.message
+        || 'Đặt hàng thất bại. Vui lòng thử lại!'
+      
+      message.error(errorMessage)
     }
   }
 
